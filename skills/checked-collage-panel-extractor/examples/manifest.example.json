@@ -1,0 +1,30 @@
+[
+  {
+    "marked": "sheet01_marked.jpg",
+    "clean": "sheet01_clean.png",
+    "rows": 2,
+    "cols": 3,
+    "prefix": "sheet01"
+  },
+  {
+    "marked": "sheet02_marked.jpg",
+    "clean": "sheet02_clean.png",
+    "rows": 2,
+    "cols": 3,
+    "prefix": "sheet02"
+  },
+  {
+    "marked": "sheet03_marked.jpg",
+    "clean": "sheet03_clean.png",
+    "rows": 2,
+    "cols": 3,
+    "prefix": "sheet03"
+  },
+  {
+    "marked": "sheet04_marked.jpg",
+    "clean": "sheet04_clean.png",
+    "rows": 2,
+    "cols": 3,
+    "prefix": "sheet04"
+  }
+]
