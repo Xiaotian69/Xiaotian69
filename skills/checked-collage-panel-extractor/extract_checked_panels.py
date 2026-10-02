@@ -12,23 +12,26 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
+import re
 import sys
 import zipfile
 from pathlib import Path
 from typing import Iterable
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
 
 
 def load_rgb(path: Path) -> Image.Image:
-    return Image.open(path).convert("RGB")
+    with Image.open(path) as image:
+        return ImageOps.exif_transpose(image).convert("RGB")
 
 
 def align_marked_to_clean(marked: Image.Image, clean: Image.Image) -> Image.Image:
     if marked.size == clean.size:
         return marked
+    if abs(marked.width / marked.height / (clean.width / clean.height) - 1) > .01:
+        raise ValueError("Marked/clean aspect ratios differ; align the sheets first.")
     return marked.resize(clean.size, Image.Resampling.LANCZOS)
 
 
@@ -112,9 +115,9 @@ def trim_white_edges(img: Image.Image, max_fraction: float = 0.06) -> Image.Imag
     return img.crop((left, top, right, bottom))
 
 
-def make_square(img: Image.Image, mode: str = "crop") -> Image.Image:
+def make_square(img: Image.Image, mode: str = "pad") -> Image.Image:
     w, h = img.size
-    if w == h:
+    if mode == "keep" or w == h:
         return img
 
     if mode == "pad":
@@ -169,7 +172,7 @@ def detect_selected_cells(
 
 
 def parse_manual(text: str | None):
-    if not text:
+    if text is None:
         return None
     out = []
     for item in text.split(";"):
@@ -178,67 +181,26 @@ def parse_manual(text: str | None):
             continue
         r, c = item.split(",")
         out.append((int(r) - 1, int(c) - 1))
+    if len(out) != len(set(out)):
+        raise ValueError("Manual selections contain duplicate cells.")
+    if not out:
+        raise ValueError("Manual selections must not be empty.")
     return out
 
 
-def export_pair(
-    marked_path: Path,
-    clean_path: Path,
-    rows: int,
-    cols: int,
-    out_dir: Path,
-    prefix: str,
-    upscale: int,
-    square_mode: str,
-    manual: list[tuple[int, int]] | None,
-    diff_threshold: float,
-    min_ratio: float,
-    min_pixels: int,
-):
-    marked = load_rgb(marked_path)
-    clean = load_rgb(clean_path)
-
-    if manual is None:
-        selected, scores = detect_selected_cells(
-            marked,
-            clean,
-            rows,
-            cols,
-            min_ratio=min_ratio,
-            min_pixels=min_pixels,
-            diff_threshold=diff_threshold,
-        )
-    else:
-        selected = manual
-        scores = []
-
-    outputs = []
-    for idx, (r, c) in enumerate(selected, start=1):
-        x0, y0, x1, y1 = grid_box(clean.width, clean.height, rows, cols, r, c)
-        crop = clean.crop((x0, y0, x1, y1))
-        crop = trim_white_edges(crop)
-        crop = make_square(crop, mode=square_mode)
-        crop = enhance(crop, upscale)
-
-        filename = f"{prefix}_{idx:02d}_r{r+1}_c{c+1}.png"
-        path = out_dir / filename
-        crop.save(path, "PNG", optimize=True)
-        outputs.append(path)
-
-    return outputs, scores
 
 
 def load_manifest(path: Path):
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, list):
-        raise ValueError("Manifest must be a JSON array.")
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(data, list) or not data:
+        raise ValueError("Manifest must be a nonempty JSON array.")
 
     base = path.parent
     normalized = []
     for i, item in enumerate(data, start=1):
         normalized.append(
             {
-                "marked": (base / item["marked"]).resolve(),
+                "marked": (base / item["marked"]).resolve() if item.get("marked") else None,
                 "clean": (base / item["clean"]).resolve(),
                 "rows": int(item.get("rows", 2)),
                 "cols": int(item.get("cols", 3)),
@@ -268,7 +230,9 @@ def build_parser():
     p.add_argument("--out", type=Path, default=Path("output"))
     p.add_argument("--expected", type=int)
     p.add_argument("--upscale", type=int, choices=[1, 2, 3, 4], default=1)
-    p.add_argument("--square-mode", choices=["crop", "pad"], default="crop")
+    p.add_argument("--square-mode", choices=["crop", "pad", "keep"], default="pad")
+    p.add_argument("--trim-white", action="store_true", help="Opt in to white-edge trimming; may remove artwork borders.")
+    p.add_argument("--gutter", type=int, default=0, help="Inset each cell edge by this many pixels.")
     p.add_argument(
         "--manual",
         help='Manual 1-based selections, e.g. "1,1;1,2;2,3". Overrides detection.',
@@ -283,19 +247,24 @@ def build_parser():
 
 def main():
     args = build_parser().parse_args()
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.expected is not None and args.expected < 1:
+        raise ValueError("--expected must be positive.")
+    if args.gutter < 0 or args.min_pixels < 1 or not 0 < args.min_ratio <= 1 or not 0 < args.diff_threshold <= 255:
+        raise ValueError("Invalid gutter or detection threshold.")
 
     jobs = []
 
     if args.manifest:
+        if args.marked or args.clean or args.manual:
+            raise ValueError("Use --manifest or single-pair arguments, not both.")
         jobs = load_manifest(args.manifest)
     else:
-        if not args.marked or not args.clean:
-            print("error: provide --manifest or both --marked and --clean", file=sys.stderr)
+        if not args.clean or (not args.marked and args.manual is None):
+            print("error: provide --manifest, or --clean with --marked or --manual", file=sys.stderr)
             return 2
         jobs = [
             {
-                "marked": args.marked.resolve(),
+                "marked": args.marked.resolve() if args.marked else None,
                 "clean": args.clean.resolve(),
                 "rows": args.rows,
                 "cols": args.cols,
@@ -304,55 +273,81 @@ def main():
             }
         ]
 
-    all_outputs = []
-
+    plans, report = [], []
+    # Validate the whole batch and count selections before writing anything.
     for job in jobs:
-        if not job["marked"].exists():
-            raise FileNotFoundError(job["marked"])
-        if not job["clean"].exists():
-            raise FileNotFoundError(job["clean"])
-
-        outputs, scores = export_pair(
-            marked_path=job["marked"],
-            clean_path=job["clean"],
-            rows=job["rows"],
-            cols=job["cols"],
-            out_dir=args.out,
-            prefix=job["prefix"],
-            upscale=args.upscale,
-            square_mode=args.square_mode,
-            manual=job["manual"],
-            diff_threshold=args.diff_threshold,
-            min_ratio=args.min_ratio,
-            min_pixels=args.min_pixels,
-        )
-
-        all_outputs.extend(outputs)
-
-        print(f"{job['prefix']}: selected {len(outputs)} panel(s)")
-        if not outputs and scores:
-            print("  No checks detected. Cell mask scores:")
-            for r, c, count, ratio in scores:
-                print(f"  r{r+1} c{c+1}: pixels={count}, ratio={ratio:.6f}")
-
-    if args.expected is not None and len(all_outputs) != args.expected:
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", job["prefix"]):
+            raise ValueError("Prefix must contain only letters, numbers, '_' or '-'.")
+        clean = load_rgb(job["clean"])
+        rows, cols = job["rows"], job["cols"]
+        if not 1 <= rows <= clean.height or not 1 <= cols <= clean.width:
+            raise ValueError("Grid dimensions must be positive and fit the source.")
+        if job["manual"] is None:
+            if job["marked"] is None:
+                raise ValueError("Each manifest job needs marked or manual.")
+            selected, scores = detect_selected_cells(load_rgb(job["marked"]), clean, rows, cols,
+                args.min_ratio, args.min_pixels, args.diff_threshold)
+        else:
+            selected, scores = job["manual"], []
+        entry = dict(prefix=job["prefix"], clean=job["clean"].name,
+                     marked=job["marked"].name if job["marked"] else None,
+                     grid=[rows, cols], scores=[dict(row=r+1, col=c+1, pixels=n, ratio=f)
+                                               for r, c, n, f in scores], panels=[])
+        for index, (row, col) in enumerate(selected, 1):
+            if not (0 <= row < rows and 0 <= col < cols):
+                raise ValueError("Manual selection is outside the grid.")
+            x0, y0, x1, y1 = grid_box(clean.width, clean.height, rows, cols, row, col)
+            box = (x0+args.gutter, y0+args.gutter, x1-args.gutter, y1-args.gutter)
+            if box[2] <= box[0] or box[3] <= box[1]:
+                raise ValueError("Gutter removes the entire cell.")
+            path = args.out / f"{job['prefix']}_{index:02d}_r{row+1}_c{col+1}.png"
+            plans.append((clean, box, path))
+            entry["panels"].append(dict(row=row+1, col=col+1, box=list(box), output=path.name))
+        report.append(entry)
+    if args.expected is not None and len(plans) != args.expected:
         print(
-            f"error: expected {args.expected} output(s), got {len(all_outputs)}",
+            f"error: expected {args.expected} output(s), got {len(plans)}; nothing exported",
             file=sys.stderr,
         )
         return 3
-
+    if not plans:
+        print(json.dumps(report, indent=2))
+        raise ValueError("No checks detected. Inspect scores or use --manual.")
+    all_outputs = [path for _, _, path in plans]
+    report_path = args.out / "selection_report.json"
+    targets = all_outputs + [report_path]
+    if args.make_zip:
+        targets.append(args.out / "selected_panels.zip")
+    if len({str(p.resolve()).casefold() for p in targets}) != len(targets):
+        raise ValueError("Output names collide; use distinct manifest prefixes.")
+    for path in targets:
+        if path.exists():
+            raise ValueError(f"Refusing to overwrite: {path}")
+    args.out.mkdir(parents=True, exist_ok=True)
+    for clean, box, path in plans:
+        crop = clean.crop(box)
+        if args.trim_white:
+            crop = trim_white_edges(crop)
+        crop = enhance(make_square(crop, args.square_mode), args.upscale)
+        crop.save(path, "PNG", optimize=True)
+    report_path.write_text(json.dumps(dict(count=len(plans), square_mode=args.square_mode,
+        upscale=args.upscale, gutter=args.gutter, trim_white=args.trim_white,
+        sheets=report), ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print(f"total: {len(all_outputs)} output(s)")
     for p in all_outputs:
         print(p)
 
     if args.make_zip and all_outputs:
         zip_path = args.out / "selected_panels.zip"
-        create_zip(all_outputs, zip_path)
+        create_zip(all_outputs + [report_path], zip_path)
         print(zip_path)
 
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        raise SystemExit(2)

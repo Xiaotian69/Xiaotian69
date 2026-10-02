@@ -33,6 +33,12 @@ I like products where AI is part of a clear user workflow—not a feature pasted
 | [Shanxi Caijing Exams](https://github.com/Xiaotian69/shanxi-caijing-exams) | Searchable, manifest-backed study-material index with integrity hashes / 带清单与完整性哈希的可检索学习资料索引 |
 | [Unipus Popup Clicker](https://github.com/Xiaotian69/unipus-popup-clicker) | A local browser utility for dismissing repetitive study-session popups / 用于处理重复学习弹窗的本地浏览器小工具 |
 
+## Open-source skills · 开源 Skills
+
+- [蓝色打勾选图拆分](skills/checked-collage-panel-extractor/) — 从无标记联系表精确拆图、校验数量、输出单张与 ZIP。
+- [古建与雕塑摄影拼贴](skills/heritage-photo-collage/) — 把摄影转成具体拼贴设计方案，支持节省额度的零生成模式。
+- [11 张大同拼贴作品与摄影原片](skills/checked-collage-panel-extractor/examples/GALLERY.md) — 查看实际效果与素材来源。
+
 ## How I work / 我的工作方式
 
 - **Start with the product truth.** I separate implemented behavior from ideas, then make the value proposition concrete.

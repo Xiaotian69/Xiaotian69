@@ -1,145 +1,28 @@
 ---
 name: checked-collage-panel-extractor
-description: Extract panels marked with bright blue/cyan check marks from contact sheets, using the matching clean contact sheets as the source. Preserve the selected artwork exactly, normalize outputs to 1:1, optionally enhance low-resolution crops, verify the requested count, and package the results.
+description: 从蓝色或青色打勾的联系表中识别选图，并从对应无标记拼图拆出单张图片，校验数量、按需放大并打包 ZIP。适用于选图拆分与原貌保留，不用于重新创作海报。
 ---
 
-# Checked Collage Panel Extractor
+# 蓝色打勾选图拆分
 
-## When to use
+打勾版负责选位置，无标记版提供最终像素。用户已有满意的作品时，拆图不能变成重新生成。
 
-Use this skill when a user provides one or more collage/contact-sheet images with blue or cyan check marks and wants the checked panels exported as separate images.
+## 输入判断
 
-Typical requests:
-- “把我打勾的图单独拆出来”
-- “根据蓝色对勾选图”
-- “不要重新生成，直接从干净版里裁出来”
-- “每张 1:1，模糊的话高清修复，最后打包”
+- 对照打勾版和无标记版，确认排列、格数、内容、边距一致。脚本支持等比例缩放，不支持截图错位、旋转、透视或不等宽布局。
+- 标记检测面向亮青色笔迹（例如 RGB 0,200,255），不是任意蓝色，也不识别对钩语义。画中原有蓝色经差分排除；新增青色文字或跨格笔迹仍可能误选。
+- 只有无标记版时，用用户明确给出的行列号（从 1 开始）指定 `--manual`。只有打勾版时，先索取干净版；不要把修补笔迹或重画描述为精确拆图。
+- 查看 [examples/GALLERY.md](examples/GALLERY.md) 了解实际风格和来源。图库中的 AI 成品是历史案例，不是本脚本生成的图。
 
-## Inputs
+## 拆分与交付
 
-Prefer two matched sets:
+在 skill 目录安装 `requirements.txt`。执行 `extract_checked_panels.py`；命令见 [README.md](README.md)。
 
-1. **Marked sheets** — used only to identify which panels were selected.
-2. **Clean sheets** — the same layouts without check marks; these are the pixel source for final crops.
+1. 明确网格和期望数量。对规则网格以 `--expected N` 校验全批数量；失败时不导出。非规则布局用明确坐标和图像编辑工具，不能强行套等分网格。
+2. 所有裁切来自干净版。保留作品内部白框、局部插图、纸纹、颗粒和版式。默认不自动去白边；测量实际分隔线后用 `--gutter`，只有确认是外部分隔线才启用 `--trim-white`。
+3. 方形输出默认 `--square-mode pad`，以留白保留构图。用户允许中心裁切时用 `crop`；要保留原比例用 `keep`。不要拉伸。
+4. 默认 `--upscale 1` 保留裁切像素；需要时用 Lanczos 放大和轻锐化。放大不能恢复源图没有的细节。生成式修复仅在用户明确要求时执行，单独标注为改绘；不能因为图小就自动调用生成模型。
+5. 核对 `selection_report.json` 的行列、裁切坐标、数量和每个输出。对错选调整手动位置，不通过重画绕过选图错误。
+6. 按需使用 `--zip`。交付单张 PNG、报告和 ZIP。脚本拒绝覆盖已有文件；重跑使用新的输出目录。
 
-Optional:
-- expected output count;
-- grid shape, e.g. 2 rows × 3 columns;
-- desired final size;
-- whether generative restoration is allowed.
-
-## Non-negotiable rules
-
-1. **Never use the marked sheet as the final crop when a clean counterpart exists.**
-2. **Do not redraw or regenerate a selected panel just because extraction is inconvenient.**
-3. Use the marked sheet only as a selection mask; crop the corresponding region from the clean sheet.
-4. Preserve the original composition, decorative insets, texture, color, grain, borders internal to the artwork, and relative placement.
-5. Remove only contact-sheet gutters, check marks, and accidental outer whitespace.
-6. Output each selected panel as **1:1**.
-7. Prefer deterministic restoration first: high-quality resampling, mild denoise, and restrained sharpening.
-8. Use generative restoration only as a fallback when the user asks for it or when the source is genuinely too small to recover non-generatively. If used, keep structure faithful and do not invent new design elements.
-9. Verify the final count against the user’s expected count before packaging.
-10. Export individual files plus a ZIP when multiple images are requested.
-
-## Workflow
-
-### 1. Pair marked and clean sheets
-
-Match each marked contact sheet with its clean version by layout and artwork identity.
-
-If there are multiple near-duplicates, compare:
-- panel positions;
-- major subjects;
-- inset thumbnails;
-- color blocks;
-- crop boundaries.
-
-### 2. Detect selected panels
-
-Best method: compare the marked sheet against its clean counterpart.
-
-The blue/cyan check marks are present only in the marked version, so use:
-- image difference;
-- a cyan/blue color mask;
-- per-cell mask area.
-
-This is more reliable than searching the marked image for “blue” alone because the artwork itself may contain blue regions.
-
-### 3. Map selections to grid cells
-
-For regular contact sheets, divide by known rows and columns.
-
-If separator gutters are visible, use them to refine boundaries. Do not let a few pixels of white gutter become part of the final image.
-
-### 4. Crop from the clean sheet
-
-For every selected cell:
-- crop the same region from the clean counterpart;
-- trim only outer gutter/whitespace;
-- preserve all content inside the panel.
-
-### 5. Normalize to 1:1
-
-Preferred order:
-1. trim separator gutters;
-2. if the panel is already approximately square, make only a minimal center crop;
-3. if a meaningful subject would be cut, pad instead of aggressively cropping.
-
-Never stretch the image non-uniformly.
-
-### 6. Restore only when needed
-
-Default non-generative enhancement:
-- Lanczos upscale;
-- mild sharpening;
-- optional light denoise.
-
-Avoid aggressive sharpening that creates halos.
-
-For AI restoration:
-- retain the original crop as the visual reference;
-- do not alter subject identity, pose, ornament, insets, typography, color blocks, or layout;
-- treat restoration as fidelity work, not redesign.
-
-### 7. QA
-
-Before delivery, check:
-- selection count;
-- no check marks remain;
-- no wrong cells;
-- no duplicate outputs;
-- 1:1 aspect ratio;
-- no leftover contact-sheet gutters;
-- correct orientation;
-- no missing inset details;
-- filenames are ordered and stable.
-
-### 8. Package
-
-Recommended naming:
-
-```text
-01_r1_c1.png
-02_r1_c2.png
-03_r1_c3.png
-...
-```
-
-Then create:
-
-```text
-selected_panels.zip
-```
-
-## Tool strategy
-
-- **Pixel-exact extraction:** Python + Pillow/NumPy, ImageMagick, Photoshop, or equivalent.
-- **Visual selection review:** built-in vision or image editor.
-- **Restoration:** deterministic resize/sharpen first; image generation/editing only when necessary.
-- **Packaging:** ZIP the final individual files.
-
-## Reference implementation
-
-This repository includes `extract_checked_panels.py`, which detects cyan/blue check marks by differencing a marked sheet against its clean counterpart and exports the corresponding clean cells.
-
-The script is intentionally conservative: it extracts existing pixels and does not use generative AI.
+“节省额度”“只拆图”“不生成”意味着零生成调用，不试多版本。按请求数量完成后停止。创作新海报时使用配套 [heritage-photo-collage](../heritage-photo-collage/SKILL.md)；已有成品拆分仍使用本 skill。
