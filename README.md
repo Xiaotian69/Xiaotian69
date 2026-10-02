@@ -33,20 +33,9 @@ I like products where AI is part of a clear user workflow—not a feature pasted
 | [Shanxi Caijing Exams](https://github.com/Xiaotian69/shanxi-caijing-exams) | Searchable, manifest-backed study-material index with integrity hashes / 带清单与完整性哈希的可检索学习资料索引 |
 | [Unipus Popup Clicker](https://github.com/Xiaotian69/unipus-popup-clicker) | A local browser utility for dismissing repetitive study-session popups / 用于处理重复学习弹窗的本地浏览器小工具 |
 
-## Stoneframe / 石间
+## Open-source skills / 开源 Skills
 
-一次大同摄影，延伸出一组复古拼贴作品，也留下两份可以复用的创作工具。
-
-| 摄影原片 | 拼贴作品 · 朱焰 |
-| :---: | :---: |
-| <img src="skills/checked-collage-panel-extractor/examples/originals/DSC09463.jpg" height="240" alt="大同石雕摄影原片参考"> | <img src="skills/checked-collage-panel-extractor/examples/artworks/artwork-01.jpg" height="240" alt="群青与朱红光环组成的石雕拼贴"> |
-
-**[浏览石间作品与 Skills](skills/)** · [11 张作品与原片参考](skills/checked-collage-panel-extractor/examples/GALLERY.md)
-
-- **[Stoneframe · 石间拼贴](skills/heritage-photo-collage/)**：从摄影中选主体，设计配色、构图与图像编辑提示词。
-- **[PanelPick · 勾选拆图](skills/checked-collage-panel-extractor/)**：在联系表上勾选作品，导出单张图片与 ZIP。
-
-Heritage photography, visual collage, and reusable skills for making and selecting images.
+- **[勾选拆图与摄影拼贴](https://github.com/Xiaotian69/checked-collage-panel-extractor)** — 联系表选图、单张导出，以及摄影拼贴作品与原片对比。
 
 ## How I work / 我的工作方式
 
