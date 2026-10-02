@@ -1,4 +1,4 @@
 interface:
-  display_name: "蓝色打勾选图拆分"
-  short_description: "从干净联系表拆出打勾选中的图片，保留原有构图并校验数量与打包"
-  default_prompt: "使用 $checked-collage-panel-extractor，从对应的打勾版和干净版拆出选中图片，核对数量并打包，不调用图像生成。"
+  display_name: "PanelPick · 勾选拆图"
+  short_description: "识别联系表上的青色勾选标记，导出原图裁切、核对数量并打包 ZIP"
+  default_prompt: "使用 $checked-collage-panel-extractor，按我的勾选标记从无标记版拼图导出单张图片，核对数量并打包。"

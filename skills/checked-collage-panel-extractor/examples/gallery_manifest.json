@@ -112,7 +112,7 @@
   "artworks": [
     {
       "id": 1,
-      "title": "火焰光环",
+      "title": "朱焰",
       "artwork": "artworks/artwork-01.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_43-1.png",
       "artwork_source_sha256": "1de9d7b080803ab79ea1be8aefbcfa7a611c5a0adf0c838a7254378de26cb14c",
@@ -125,11 +125,11 @@
       "photographic_reference": "originals/DSC09463.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "单一朱红火焰光环、群青背景，石雕占据大部分画面。"
+      "notes": "朱红火焰铺在群青底色上，石像居于前景；轮廓和暖色石纹构成画面的重心。"
     },
     {
       "id": 2,
-      "title": "巨掌与白环",
+      "title": "掌与环",
       "artwork": "artworks/artwork-02.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_44-2.png",
       "artwork_source_sha256": "89692c63408bdcfec6074b9810d3d06504ce138448783f2858a7070154e8dd69",
@@ -142,11 +142,11 @@
       "photographic_reference": "originals/DSC09458.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": "originals/DSC09463.jpg",
-      "notes": "巨型佛手建立尺度反差，右侧缩小主体与旧纸白环。"
+      "notes": "放大的手掌占据左侧，右侧保留较小的佛像与白环，用尺度差建立阅读顺序。"
     },
     {
       "id": 3,
-      "title": "金面与目光回声",
+      "title": "窟中金面",
       "artwork": "artworks/artwork-03.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_45-3.png",
       "artwork_source_sha256": "5ec7f7496c816cafa96b79d036ffaa8fab531a2a27e1f7313f19a30d5b0422a0",
@@ -159,11 +159,11 @@
       "photographic_reference": "originals/DSC09298.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "保留遮挡关系，灰度双眼、彩绘局部与圆形卷纹形成回声。"
+      "notes": "半掩的金色面孔作为主视觉，眼部、彩绘和蓝色卷纹在右侧重复出现。"
     },
     {
       "id": 4,
-      "title": "千佛壁的印刷节奏",
+      "title": "千龛",
       "artwork": "artworks/artwork-04.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_47-4.png",
       "artwork_source_sha256": "5ff947920d14c5e726640ea6984d41b6888abe2586e0beb95aa5e6ddc6a7dd0f",
@@ -176,11 +176,11 @@
       "photographic_reference": "originals/DSC09551.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "大面积佛龛斜线，左侧灰度和红色、右下黄色形成局部节奏。"
+      "notes": "佛龛沿斜线铺开，灰度、朱红与金黄的局部框，把连续图案拆成几段节奏。"
     },
     {
       "id": 5,
-      "title": "持供器菩萨",
+      "title": "蓝纹",
       "artwork": "artworks/artwork-05.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_48-5.png",
       "artwork_source_sha256": "9e223ea1824d407303cd844030cec3cbd92f97dafe197c4674dd01c2bda7be8c",
@@ -193,11 +193,11 @@
       "photographic_reference": "originals/DSC09240.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "彩绘感主体、朱红背光、群青卷纹与三枚细节小框。"
+      "notes": "主体的暖色表面与群青卷纹并置，右侧小框再次呈现脸部和供器细节。"
     },
     {
       "id": 6,
-      "title": "佛龛与石像对角线",
+      "title": "石壁回声",
       "artwork": "artworks/artwork-06.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_50-6.png",
       "artwork_source_sha256": "eaafb3bb7a62d9bebbd2267d81db37631111e3c5c35be8ed90e25005b82c4d5f",
@@ -210,11 +210,11 @@
       "photographic_reference": "originals/DSC09551.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": "originals/DSC09463.jpg",
-      "notes": "佛龛为主背景，左下灰度佛像与右下细节框形成对角线。"
+      "notes": "满壁佛龛与左下方的灰度石像形成对角线，右下的小框收拢视线。"
     },
     {
       "id": 7,
-      "title": "侧脸与群像",
+      "title": "石上侧影",
       "artwork": "artworks/artwork-07.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_52-7.png",
       "artwork_source_sha256": "4326419dab75024ec1c16cc03497ccb7a83e3ea97db023ce4484cb1a1e670a78",
@@ -227,11 +227,11 @@
       "photographic_reference": "originals/DSC09548.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "低角度侧脸与微小雕像，右侧灰度回声，金黄弧线保持主焦点。"
+      "notes": "雕像侧脸与细密群像占据左侧，右侧的灰度片段呼应石刻的层次。"
     },
     {
       "id": 8,
-      "title": "窟中目光与蓝纹",
+      "title": "蓝色洞窟",
       "artwork": "artworks/artwork-08.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_53-8.png",
       "artwork_source_sha256": "4ab6d46590b4eb0d3f065ba81ace62aba9642eedfdcf335b012d091fe9894a4a",
@@ -244,11 +244,11 @@
       "photographic_reference": "originals/DSC09298.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "窟口和残损彩绘作为真实基底，左侧卷纹与右侧细节形成回声。"
+      "notes": "金面隐于窟口，蓝色卷纹沿边缘展开，彩绘栏板横向稳住画面。"
     },
     {
       "id": 9,
-      "title": "彩绘千佛的密度",
+      "title": "金色层叠",
       "artwork": "artworks/artwork-09.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_54-9.png",
       "artwork_source_sha256": "81c6399a2fd75a69299c8677de30097541ef1e60469034f0b1406c1a2eae4ab2",
@@ -261,11 +261,11 @@
       "photographic_reference": "originals/DSC09329.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "保留密集龛像与曲线，右上圆形花纹和左下灰度条带建立层次。"
+      "notes": "彩绘佛龛、花纹与雕像密集叠放，圆形细节和灰度条带为画面留出停顿。"
     },
     {
       "id": 10,
-      "title": "巨像与金黄圆环",
+      "title": "圆光",
       "artwork": "artworks/artwork-10.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_16_58-10.png",
       "artwork_source_sha256": "5d19f291a46e28b1cb2c2e474ea276a686ecf8d9f02c801665a5991206e0550e",
@@ -278,11 +278,11 @@
       "photographic_reference": "originals/DSC09463.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": "originals/DSC09551.jpg",
-      "notes": "巨像、佛龛和金黄背光圆环，右下衣纹细节框提供触觉感。"
+      "notes": "金黄圆环托起石像头部，佛龛作为侧面背景，右下衣纹框补充细节。"
     },
     {
       "id": 11,
-      "title": "供器与右侧三联框",
+      "title": "托举",
       "artwork": "artworks/artwork-11.jpg",
       "artwork_source_filename": "ChatGPT 图像 2026年10月2日 00_17_00-11.png",
       "artwork_source_sha256": "ee0b8b7be2f2947501f2bdcd6b8c79147bfdd3d601302d8d99aa756740af3337",
@@ -295,7 +295,7 @@
       "photographic_reference": "originals/DSC09240.jpg",
       "reference_status": "visual correspondence inferred; historical prompt and exact source mapping unavailable",
       "additional_reference": null,
-      "notes": "站立持供器主体、大面积金黄圆形色块、群青纹样和三联供器小框。"
+      "notes": "菩萨与手中供器形成主视觉，金黄圆形色块和右侧三联框重复托举的形状。"
     }
   ]
 }

@@ -1,4 +1,4 @@
 interface:
-  display_name: "古建与雕塑摄影拼贴"
-  short_description: "为佛像、石窟与古建照片设计复古拼贴，保留真实材质并输出具体方案"
-  default_prompt: "使用 $heritage-photo-collage，为我的摄影照片制定具体的复古拼贴 brief 和最终 prompt，本轮不生成图片。"
+  display_name: "Stoneframe · 石间拼贴"
+  short_description: "从石窟与古建摄影出发，设计复古拼贴的主体、配色、构图和提示词"
+  default_prompt: "使用 $heritage-photo-collage，为我的照片设计一张石间风格拼贴，先给出具体方案与提示词。"

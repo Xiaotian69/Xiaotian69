@@ -1,92 +1,115 @@
-# 蓝色打勾选图拆分 · Checked Collage Panel Extractor
+<div align="center">
 
-把联系表中打勾的小图，独立拆成单张图片。**用打勾版选位置，从无标记版取像素。** 支持数量校验、手动选格、方形留白、确定性放大和 ZIP 打包。
+# PanelPick · 勾选拆图
 
-![11 张大同石窟拼贴作品预览](examples/gallery-contact.jpg)
+**勾选喜欢的作品，导出独立图片。**
 
-这组作品来自作者 Xiaotian69 的大同摄影与 AI 拼贴实践。它们展示石雕质感、群青与朱红色块、巨型光环、局部回声插图和旧纸印刷纹理。**11 张效果图是已有 AI 作品；此工具负责拆图，不负责生成这些作品。** 查看 [完整图库与摄影原片](examples/GALLERY.md)、[来源清单](examples/gallery_manifest.json)。想用自己的照片创作同类海报，见配套 [摄影拼贴创作 skill](../heritage-photo-collage/)。
+支持青色标记选图、数量核对、单张导出与 ZIP 打包。
 
-## 安装为 skill
+[快速开始](#快速开始) · [作品集](examples/GALLERY.md) · [石间拼贴](../heritage-photo-collage/)
 
-下载本仓库，把整个 `skills/checked-collage-panel-extractor` 文件夹复制到 agent 的 skills 目录。
+</div>
 
-- Windows Codex：`%USERPROFILE%\.codex\skills\checked-collage-panel-extractor`
-- macOS / Linux：`~/.codex/skills/checked-collage-panel-extractor`
+![11 张大同拼贴作品](examples/gallery-contact.jpg)
 
-若客户端设置了自定义 skills 目录，以该目录为准。重新加载客户端后使用：
+一张联系表里有很多小图，你只想留下其中几张。PanelPick 读取勾选位置，从对应的无标记拼图裁出作品，交付单张 PNG 和压缩包。
 
-> 使用 $checked-collage-panel-extractor，从打勾版和无标记版联系表提取我选中的 11 张，保留内部白框和拼贴细节，输出 1:1 单张 PNG 与 ZIP。不调用图像生成。
+它适合摄影选片、AI 海报筛选和拼贴作品整理。作品内部的白框、插图与纸纹会一起保留；方形输出默认用留白补齐构图。
 
-其他支持读取 Markdown 指令、运行 Python 的 agent 也可使用 [SKILL.md](SKILL.md)。
+这组大同拼贴是项目的作品示例。想从自己的照片创作类似海报，可以使用 [Stoneframe · 石间拼贴](../heritage-photo-collage/)；查看 [完整作品与摄影参考](examples/GALLERY.md)。
 
-## 本地运行
+## 看一组原片与作品
 
-需要 Python 3.10+。进入本 skill 目录：
+| 摄影原片 | AI 拼贴 |
+| :---: | :---: |
+| <img src="examples/originals/DSC09298.jpg" height="320" alt="处理前：完整构图的摄影原片参考"> | <img src="examples/artworks/artwork-03.jpg" height="320" alt="处理后：AI 艺术拼贴作品"> |
+
+这张《窟中金面》把眼部、彩绘和卷纹重新组织为拼贴细节。它是已有的 AI 作品；PanelPick 用于从成品联系表中导出选中的格子。[更多原片对比](examples/GALLERY.md)。
+
+## 快速开始
+
+准备两张内容与排列一致的图片：一张画了亮青色勾选标记，一张没有标记。格子应等宽、等高。
+
+在本目录安装依赖，运行命令：
 
 ```sh
 python -m pip install -r requirements.txt
+python extract_checked_panels.py --marked marked.png --clean clean.png --rows 2 --cols 3 --out selected --expected 3 --zip
 ```
 
-仓库自带可以直接运行的 2×3 示例，无需生成图片：
+这个例子处理一张 2 行、3 列的联系表，导出 3 张选中的作品。把文件名、行列和数量换成自己的即可。需要 Python 3.10+。
+
+**想先试一下？** 仓库附有可直接运行的示例：
 
 ```sh
 python extract_checked_panels.py --manifest examples/manifest.example.json --out demo-output --expected 3 --square-mode keep --zip
 ```
 
-示例青色笔迹由本地画线模拟，三个输出来自对应干净版；示例仅用于验证拆分。网格没有外部间隙。下面的单组命令同样适用于 Windows PowerShell：
+## 在 Agent 中使用
 
-```sh
-python extract_checked_panels.py --marked marked.png --clean clean.png --rows 2 --cols 3 --out selected --expected 3 --zip
+把整个 `checked-collage-panel-extractor` 文件夹复制到客户端的 skills 目录。Codex 常用目录：
+
+- Windows：`%USERPROFILE%\.codex\skills\`
+- macOS / Linux：`~/.codex/skills/`
+
+重新加载后，可以直接说：
+
+> 使用 $checked-collage-panel-extractor，按照我的青色勾选标记，从无标记版拼图拆出 11 张。输出 1:1 PNG 和 ZIP，保留内部白框与插图。
+
+客户端中的显示名称是 **PanelPick · 勾选拆图**，调用标识仍是 `checked-collage-panel-extractor`。[SKILL.md](SKILL.md) 也可以交给能够读图、运行 Python 的其他 Agent。
+
+## 导出结果
+
+输出目录包含以下文件：
+
+```text
+selected/
+├── sheet01_01_r1_c1.png
+├── …
+├── selection_report.json
+└── selected_panels.zip
 ```
 
-只给干净版、明确指定行列：
+报告记录选中的行列、裁切位置和来源文件。ZIP 包含本轮图片与报告。数量不符合 `--expected` 时不会导出；同名文件已存在时，换一个输出目录再运行。
+
+## 常用调整
+
+| 需求 | 参数 |
+| --- | --- |
+| 保持每格原比例 | `--square-mode keep` |
+| 用白色留白补成方形（默认） | `--square-mode pad` |
+| 允许中心裁切为方形 | `--square-mode crop` |
+| 本地放大 2 倍 | `--upscale 2` |
+| 去掉测量好的外部分隔线 | `--gutter 4`；每格四边各收 4 像素 |
+| 指定选中位置 | `--manual "1,1;1,3;2,2"`；行列从 1 开始 |
+| 处理多张联系表 | `--manifest batch.json`；见 [示例清单](examples/manifest.example.json) |
+
+手动选格只需要无标记版：
 
 ```sh
 python extract_checked_panels.py --clean clean.png --rows 2 --cols 3 --manual "1,1;1,3;2,2" --out manual-output --expected 3 --square-mode keep
 ```
 
-多组输入在 JSON 数组中列出，路径相对 manifest 所在文件夹。每组需要 `clean`、`marked`（或 `manual`）、`rows`、`cols`，并使用不同的 `prefix`。
+自动去白边 `--trim-white` 默认关闭，因为白色可能是作品的一部分。放大使用 Lanczos 与锐化，不会补出源图没有的细节。
 
-## 输出和参数
+## 使用前确认
 
-| 参数 | 默认值 | 用途 |
-| --- | --- | --- |
-| `--expected N` | 不指定 | 写文件前验证全批张数；不匹配退出码 3 |
-| `--square-mode pad` | pad | 以白色留白补成方形，不裁掉内容 |
-| `--square-mode crop` | — | 明确选择中心裁切为方形 |
-| `--square-mode keep` | — | 保持每格原比例 |
-| `--upscale 1/2/3/4` | 1 | Lanczos 放大加锐化；不是 AI 细节重建 |
-| `--gutter N` | 0 | 每格四边各向内收 N 像素；须先测量分隔线 |
-| `--trim-white` | 关闭 | 启用去白边启发式；也可能删掉作品白框 |
-| `--manual "1,1;2,3"` | 自动检测 | 从 1 开始的行列；覆盖检测 |
-| `--zip` | 关闭 | 打包本轮 PNG 和选择报告 |
+标记应是亮青色，例如 RGB `0,200,255`，尽量画在格子内部。脚本通过颜色和图像差异识别新增笔迹；它不会判断对钩形状，青色文字或跨格标记也可能被选中。检测不准时可改用手动行列。
 
-输出命名如 `sheet01_01_r1_c1.png`，另有 `selection_report.json`；ZIP 为 `selected_panels.zip`。报告记录来源文件名、格数、每格差分检测得分、选择位置和裁切坐标。输出已存在时拒绝覆盖，换一个输出目录再运行。
+两张图片需要位置一致。等比例缩放可以处理；平移、旋转、裁切或透视变化需要先对齐。不等宽的拼贴布局应使用明确的裁切坐标。
 
-**兼容性变化：** 旧版默认中心裁切和自动去白边；现在默认补白、保留白边。要使用旧处理方式，显式添加 `--square-mode crop --trim-white`。增强仍是本地操作，不消耗图像生成额度。
+旧版默认中心裁切和自动去白边；要保留旧处理方式，添加 `--square-mode crop --trim-white`。
 
-## 检测边界
+## 参与改进
 
-脚本比较对应图片的像素差异，再筛选亮青色新增笔迹，不会把原有群青背景当成勾。它不识别对钩形状；新增青色文字也可能触发。打勾应落在格子内部，避免压在格子边界。检测不准时检查报告并用 `--manual`。
-
-等比例缩放可自动对齐；裁切、平移或视角变化需要预先对齐。白边与艺术白框无法仅凭颜色可靠区分。脚本只适合等分规则网格，不适合错落拼贴布局。
-
-## 开发与复现
+遇到问题时，欢迎提供小样、运行命令、预期选格和输出报告。测试命令：
 
 ```sh
 python -m unittest discover -s tests -v
 ```
 
-测试覆盖蓝色背景排除、从干净版获取像素、白框保留、数量失败时零导出、选格越界、重复选格、重名覆盖和 ZIP 内容。
+代码与文档采用 [MIT License](LICENSE)。图库中的 AI 作品及摄影来源见 [素材说明](examples/GALLERY.md#素材说明)。
 
-欢迎提交可复现的问题：提供不涉及隐私的小样、运行命令、行列号、预期张数与报告。风格实践指南在 [配套 skill](../heritage-photo-collage/)，不会作为精确拆图的生成式后门。
+---
 
-## English
-
-A reusable agent skill and Python utility for exporting checked panels from contact sheets. The marked sheet determines selection; the matching clean sheet supplies every output pixel. Bright cyan annotations are detected with color filtering **and** image differencing, so existing blue artwork is excluded.
-
-Defaults preserve artwork: square padding, no automatic white-border trimming, no upscaling. Count checks and collision checks run before export. Manual 1-based coordinates work without a marked sheet. The included runnable example selects three cells; the historical gallery contains eleven AI artworks and photographic source references. No image-generation service or API key is required for extraction.
-
-## License
-
-代码与文档沿用 [MIT License](LICENSE)。示例照片与 AI 作品由 Xiaotian69 提供，作者及来源见图库清单；图片不是对文物现状的记录或考据资料。
+**English** — PanelPick exports checked panels from a contact sheet. The annotated sheet identifies the selection; the matching clean sheet supplies the image pixels. It supports manual coordinates, count checks, square padding, local upscaling and ZIP export. Extraction requires no image-generation service or API key.

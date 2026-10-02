@@ -1,9 +1,9 @@
 ---
 name: heritage-photo-collage
-description: 将佛像、石窟、古建、壁画和雕塑摄影整理为具有真实材质的复古视觉拼贴，提供具体设计 brief、配色和可执行 prompt，或在用户要求时制作海报。适用于摄影再创作，不用于从现有联系表精确拆图。
+description: 为佛像、石窟、古建和壁画摄影设计复古拼贴，提供选片、配色、构图与参考图编辑提示词；用户要求制作时调用可用图像工具。支持超现实波普、梦核与仅写方案模式。
 ---
 
-# 古建与雕塑摄影拼贴
+# Stoneframe · 石间拼贴
 
 以用户照片中可识别的主体作为视觉锚点，通过色块、尺度、局部回声和印刷质感建立版式。参考 [风格与 prompt 指南](references/design-guide.md)；历史成品和原片见 [作品图库](../checked-collage-panel-extractor/examples/GALLERY.md)。
 
@@ -31,4 +31,4 @@ description: 将佛像、石窟、古建、壁画和雕塑摄影整理为具有�
 
 原片只读，在输出目录建立工作副本。制作时检查脸部身份、手指数量、真实缺损、石刻纹理、框中片段来源与边界。AI 输出可能改写细节，标为艺术再创作，不能声称像素保真或文物修复。
 
-已有满意联系表需要拆单张时，转交 [checked-collage-panel-extractor](../checked-collage-panel-extractor/SKILL.md) 的确定性流程，从干净版取像素。模型重画不能当作裁切。完成本轮约定结果后停止，不自动扩展整个系列。
+已有满意联系表需要拆单张时，转交 [PanelPick · 勾选拆图](../checked-collage-panel-extractor/SKILL.md) 的确定性流程，从干净版取像素。模型重画不能当作裁切。完成本轮约定结果后停止，不自动扩展整个系列。
