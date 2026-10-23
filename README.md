@@ -35,8 +35,8 @@ AI 辅助的数学分析学习工作台：按教材结构组织知识点，讲�
 
 ### 📍 [CxSign](https://github.com/Xiaotian69/CampusSign) · [Releases](https://github.com/Xiaotian69/CampusSign/releases/latest)
 
-学习通（超星）位置签到 Windows 图形界面工具：选择账号与地点后由用户手动发起签到并逐项反馈结果，支持多账号、自定义地点与导入导出，配置仅保存在本机。<br>
-*A Windows GUI tool for Chaoxing location check-ins, with multi-account support and customizable places.* · `Python` `Desktop`
+学习通（超星）位置签到 Windows 桌面工具：自动读取课程、多账号一次操作、固定位置或按指定地点匹配、粘贴百度地图网址即可添加地点；由用户手动发起，逐账号反馈结果，数据仅存本机。<br>
+*A Windows desktop tool for Chaoxing (Xuexitong) location check-ins: course lookup, multi-account runs and place matching.* · `Python` `Desktop`
 
 ### 🧭 [Anker AI Native Product Lab](https://github.com/Xiaotian69/anker-ai-native-product-lab) · [Live](https://xiaotian69.github.io/anker-ai-native-product-lab/)
 
